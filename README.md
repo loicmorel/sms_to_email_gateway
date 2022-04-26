@@ -1,11 +1,11 @@
 # SMS TO EMAIL GATEWAY
-- A simple SMS gateway to forward SMS received from a SIM card to an email address.
+- A simple SMS gateway to forward SMS received from a SIM card to an email address, with Raspberry Pi and LTE modem.
 
 ## Startup the project
 
-Go to `https://www.notion.so/SMS-Gateway-779235cd14384d9d9fe48c57626fce59` to see the project.
+- Go to `https://www.notion.so/SMS-Gateway-779235cd14384d9d9fe48c57626fce59` to see the project.
 
-The initial setup, module creation and SD card first boot done.
+- The initial setup of the module and SD card first boot done. WiFi connected...
 
 Connect to the module by ssh:
 ```bash
@@ -31,7 +31,6 @@ sudo setup-config.sh config.ini
 
 ## Verify the module
 
-Functionnal test:
 ```bash
 # send a test email
 send_test_email.sh
@@ -45,21 +44,20 @@ cat /var/log/start-modem.log
 cat /var/log/send_test_email.log
 ```
 
-# Configuration
+# Configuration structure
 
-Configuration structure
 ```bash
 # sms_to_email_gateway configuration
 # run to initiate the config
 # > setup-config.sh [config.ini]
 
 # config sms wraper
-MODEM_TTY=/dev/ttyUSB0
+MODEM_TTY=/dev/ttyUSB2
 INCOMING_SMS_P=/var/spool/sms/incoming
 
 # config wifi
-SSID=Lnboss
-WIFI_PWD=0614647702
+SSID=[ssid]
+WIFI_PWD=[pwd]
 
 # config APN for LTE communication
 APN=cmhk
