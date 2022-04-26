@@ -16,12 +16,14 @@ ssh user@[IP]
 
 Install sms_to_email_gateway package
 ```bash
+# Install dependencies
+sudo apt-get -y install vim git
+
 # Download git project
 cd /home/user
 git clone https://github.com/loicmorel/sms_to_email_gateway
 
 # Edit configuration file
-sudo apt-get install vim
 vim /home/user/sms_to_email_gateway/config.ini
 
 # Install the package
