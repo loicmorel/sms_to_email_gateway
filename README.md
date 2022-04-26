@@ -3,7 +3,7 @@
 
 ## Startup the project
 
-- Go to `https://www.notion.so/SMS-Gateway-779235cd14384d9d9fe48c57626fce59` to see the project.
+- Go to `https://enchanted-geranium-c69.notion.site/SMS-Gateway-779235cd14384d9d9fe48c57626fce59` to see the project.
 
 - The initial setup of the module and SD card first boot done. WiFi connected...
 
@@ -20,26 +20,29 @@ Install sms_to_email_gateway package
 sudo apt-get -y install vim git
 
 # Download git project
-cd /home/user
+cd ~/
 git clone https://github.com/loicmorel/sms_to_email_gateway
 
 # Edit configuration file
 vim /home/user/sms_to_email_gateway/config.ini
 
 # Install the package
-cd /home/user/sms_to_email_gateway
-sudo setup-config.sh config.ini
+cd ~/sms_to_email_gateway
+sudo ./setup-config.sh config.ini
+
+# reboot the module
+sudo reboot
 ```
 
 ## Verify the module
 
 ```bash
 # send a test email
-send_test_email.sh
+send-test-email.sh
 
 # check APN and SIM card caracteristics
-qmicli -d /dev/cdc-wdm0 --nas-get-home-network
-qmicli -d /dev/cdc-wdm0 --uim-get-card-status
+sudo qmicli -d /dev/cdc-wdm0 --nas-get-home-network
+sudo qmicli -d /dev/cdc-wdm0 --uim-get-card-status
 
 # check logs
 cat /var/log/start-modem.log
