@@ -3,29 +3,30 @@
 
 ## Startup the project
 
-The initial setup.
-
 Go to `https://www.notion.so/SMS-Gateway-779235cd14384d9d9fe48c57626fce59` to see the project.
 
-Connect to the module by ssh
+The initial setup, module creation and SD card first boot done.
+
+Connect to the module by ssh:
 ```bash
 # from host [module has first boot done]
-ping smsgw.local
+ping smsgw.local # => get module IP
 ssh user@[IP]
 ```
 
-Install package
+Install sms_to_email_gateway package
 ```bash
 # Download git project
 cd /home/user
-pip install git+ssh://git@github.com/loicmorel/PACKAGE_NAME
+git clone https://github.com/loicmorel/sms_to_email_gateway
 
 # Edit configuration file
 sudo apt-get install vim
 vim /home/user/sms_to_email_gateway/config.ini
 
 # Install the package
-sudo /home/user/sms_to_email_gateway/setup-config.sh /home/user/sms_to_email_gateway/config.ini
+cd /home/user/sms_to_email_gateway
+sudo setup-config.sh config.ini
 ```
 
 ## Verify the module
