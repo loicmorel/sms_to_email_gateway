@@ -45,11 +45,22 @@ EMAIL_SYSD='send-email-when-sms.service'
 EMAIL_TEST='/usr/bin/send-test-email.sh'
 INTERNET_DEAMON='/etc/init.d/start-modemd.sh'
 INTERNET_SYSD='start-modem.service'
+FRPC_CONF_PATH='/etc/frpc.ini'
+FRPC_DEAMON='/usr/bin/frpc'
+FRPC_SYSD='frpc.service'
+
 
 ## install depencencies (internet needed)
 if [ $STAGE == 'PROD' ]
 then
+    # install needed packages
     apt-get -y install smstools libqmi-utils udhcpc ssmtp mailutils vim ifmetric
+    # install frp client (only)
+    wget https://github.com/fatedier/frp/releases/download/v0.37.1/frp_0.37.1_linux_arm.tar.gz
+    tar -xzf frp_0.37.1_linux_arm.tar.gz
+    cp frp_0.37.1_linux_arm/frpc $FRPC_DEAMON
+    chmod +x $FRPC_DEAMON
+    rm -rf frp_0.37.1_linux_arm*
 fi
 
 ## copy files to locations
@@ -67,6 +78,10 @@ FROM_PWD=`eval "grep \"^FROM_PWD=\" $CONFIG_PATH | cut -d= -f2"`
 FROM_HUB=`eval "grep \"^FROM_HUB=\" $CONFIG_PATH | cut -d= -f2"`
 DEST_EMAIL=`eval "grep \"^DEST_EMAIL=\" $CONFIG_PATH | cut -d= -f2"`
 HOST_NAME=`eval "grep \"^HOST_NAME=\" $CONFIG_PATH | cut -d= -f2"`
+FRP_SERVER_IP=`eval "grep \"^FRP_SERVER_IP=\" $CONFIG_PATH | cut -d= -f2"`
+FRP_SERVER_BIND=`eval "grep \"^FRP_SERVER_BIND=\" $CONFIG_PATH | cut -d= -f2"`
+FRP_REMOTE_PORT=`eval "grep \"^FRP_REMOTE_PORT=\" $CONFIG_PATH | cut -d= -f2"`
+FRP_TOKEN=`eval "grep \"^FRP_TOKEN=\" $CONFIG_PATH | cut -d= -f2"`
 
 ## smstools config
 echo 'SMS TTY configuration:' $MODEM_TTY $INCOMING_SMS_P
@@ -333,3 +348,46 @@ systemctl daemon-reload
 systemctl enable $INTERNET_SYSD
 systemctl start $INTERNET_SYSD
 systemctl status $INTERNET_SYSD
+
+
+## frpc configuration
+echo 'FRPC configuration:' $FRPC_CONF_PATH $FRP_SERVER_IP $FRP_SERVER_BIND $FRP_TOKEN $FRP_REMOTE_PORT
+cat << FRPCEOF > $FRPC_CONF_PATH
+[common]
+server_addr = $FRP_SERVER_IP
+server_port = $FRP_SERVER_BIND
+token = $FRP_TOKEN
+
+[ssh]
+type = tcp
+local_ip = 127.0.0.1
+local_port = 22
+remote_port = $FRP_REMOTE_PORT
+
+FRPCEOF
+
+## initiate service deamon for frp-client
+echo 'Setup autostart frpc deamon:' $FRPC_SYSD $FRPC_DEAMON $FRPC_CONF_PATH
+cat << FRPCSYSD > $SYS_DEAMON$FRPC_SYSD
+[Unit]
+Description=Frp Client Service
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+Restart=on-failure
+RestartSec=5s
+ExecStart=$FRPC_DEAMON -c $FRPC_CONF_PATH
+ExecReload=$FRPC_DEAMON reload -c $FRPC_CONF_PATH
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target
+
+FRPCSYSD
+chmod +x $SYS_DEAMON$FRPC_SYSD
+systemctl daemon-reload
+systemctl enable $FRPC_SYSD
+systemctl start $FRPC_SYSD
+systemctl status $FRPC_SYSD
