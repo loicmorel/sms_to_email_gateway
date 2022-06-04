@@ -1,0 +1,19 @@
+version: '2.2'
+services:
+  frp:
+    container_name: frp
+    image: cloverzrg/frps-docker
+    restart: always
+    hostname: frp.local
+    ports:
+      # WEB UI
+      - 8080:8080
+      # SSH PORT USED TO SETUP TUNNEL
+      - 7000:7000
+      # SSH PORT RANGE FOR REMOTE DEVICES TO FORWARD TO
+      - 6960-6965:6960-6965
+    expose:
+      - 8080
+      - 7000
+    volumes:
+      - ./volumes:/conf
