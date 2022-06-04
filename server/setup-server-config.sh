@@ -11,6 +11,7 @@ chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 # start FRP on the server
+cd frp
 docker-compose up -d
 docker-compose logs -f
 docker-compose ps
